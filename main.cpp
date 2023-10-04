@@ -11,11 +11,11 @@ struct Nodo{
 void Cargar_archivo(FILE*);
 void Procesar_archivo(FILE*,Nodo*[100][7]);
 void Emitir_reporte(Nodo* [100][7]);
+
 void IngresarDatos(int &, int &, int &);
 void mostrar_Reservasttl(int &);
 Nodo * Apilar(Nodo *, int);
 void mostrar_lista(Nodo *);
-//Formato de guardado:Cod_ciudad + Cod_dia + Nodo
 void test(int, int, int);
 
 
@@ -24,7 +24,7 @@ int main(){
     FILE * reservaFile;
     reservaFile = fopen("RESERVAS.DAT","ab+"); //Ab+ para que el write no sobrescriba el archivo
 
-    //Cargar_archivo(reservaFile);
+    Cargar_archivo(reservaFile);
     Procesar_archivo(reservaFile,ReservasV);
     fclose(reservaFile);
     Emitir_reporte(ReservasV);
@@ -33,18 +33,18 @@ int main(){
 };
 
 // Funciones principales
-void Cargar_archivo(FILE* reservaFile) {
+void Cargar_archivo(FILE* reservaFile) { //Escribe el archivo
     int Cod_ciudadTemp, Cod_diaTemp,dniTemp;
     int endLoop;
 
-    while (endLoop != -1){
+    while (endLoop != 0){
         IngresarDatos(Cod_ciudadTemp,Cod_diaTemp,dniTemp);
 
         fwrite(&Cod_ciudadTemp,sizeof(Cod_ciudadTemp),1,reservaFile);
         fwrite(&Cod_diaTemp,sizeof(Cod_diaTemp),1,reservaFile);
         fwrite(&dniTemp,sizeof(dniTemp),1,reservaFile);
 
-        cout << "¿Desea continuar ? (-1 para salir)"<< "\n";
+        cout << "¿Desea continuar ? (0 para salir)"<< "\n";
         cin >> endLoop;
     };
 };
@@ -52,13 +52,14 @@ void Cargar_archivo(FILE* reservaFile) {
 void Procesar_archivo(FILE* reservaFile,Nodo * bReservasV[100][7]) {
     int Cod_ciudadTemp, Cod_diaTemp,dniTemp;
     Nodo * head = NULL;
+    fseek(reservaFile,0, SEEK_SET);
     while (!feof(reservaFile)){ // lee hasta que llegue al final
         fread(&Cod_ciudadTemp,sizeof(Cod_ciudadTemp),1,reservaFile);
         fread(&Cod_diaTemp,sizeof(Cod_diaTemp),1,reservaFile);
         fread(&dniTemp,sizeof(dniTemp),1,reservaFile);
-        //test(Cod_ciudadTemp,Cod_diaTemp,dniTemp);
+        test(Cod_ciudadTemp,Cod_diaTemp,dniTemp); // Muesta las variables que leyó
 
-        head = bReservasV[Cod_ciudadTemp][Cod_diaTemp]; 
+        head = bReservasV[Cod_ciudadTemp][Cod_diaTemp];
         bReservasV[Cod_ciudadTemp][Cod_diaTemp] = Apilar(head,dniTemp);
     };
 };
@@ -106,16 +107,16 @@ void mostrar_Reservasttl(int &cantReservas){
 };
 
 void mostrar_lista(Nodo *head){// Mustra la lista 
-    Nodo *temp = head; // crea un copia de la lista 
+    Nodo *temp = head; // crea un copia de la lista para recorrerla 
     cout << "\t";
     while (temp != NULL){
         cout << " Dni = " << temp->dni;
-        temp = temp->sig; // temp = (*temp).sig;  //Va a la siguiente direccion  
+        temp = temp->sig;  //Va a la siguiente direccion  
     };
     cout << "\n";
 };
 
-void test(int Cod_ciudadTemp, int Cod_diaTemp, int dniTemp){ //Para ver los valores leidos
+void test(int Cod_ciudadTemp, int Cod_diaTemp, int dniTemp){ //Para ver los valores leidos 
         cout << " Ciudad = "<< Cod_ciudadTemp << "\n";
         cout << " Dia = "<< Cod_diaTemp << "\n";
         cout << " Dni = "<< dniTemp << "\n";
