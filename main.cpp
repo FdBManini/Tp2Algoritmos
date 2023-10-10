@@ -12,10 +12,11 @@ void Cargar_archivo(FILE*);
 void Procesar_archivo(FILE*,Nodo*[100][7]);
 void Emitir_reporte(Nodo* [100][7]);
 
+void menu(FILE*,Nodo*[100][7]);
 void IngresarDatos(int &, int &, int &);
 void mostrar_Reservasttl(int &);
 Nodo * Apilar(Nodo *, int);
-void mostrar_lista(Nodo *);
+void mostrar_lista(Nodo *,int &);
 void test(int, int, int);
 
 
@@ -24,16 +25,13 @@ int main(){
     FILE * reservaFile;
     reservaFile = fopen("RESERVAS.DAT","ab+"); //Ab+ para que el write no sobrescriba el archivo
 
-    Cargar_archivo(reservaFile);
-    Procesar_archivo(reservaFile,ReservasV);
+    menu(reservaFile,ReservasV);
     fclose(reservaFile);
-    Emitir_reporte(ReservasV);
-
     return 0;
 };
 
 // Funciones principales
-void Cargar_archivo(FILE* reservaFile) { //Escribe el archivo
+void Cargar_archivo(FILE* reservaFile) { //Escribe el archivo (Formato de guardado:Cod_ciudad + Cod_dia + Nodo)
     int Cod_ciudadTemp, Cod_diaTemp,dniTemp;
     int endLoop;
 
@@ -64,21 +62,48 @@ void Procesar_archivo(FILE* reservaFile,Nodo * bReservasV[100][7]) {
     };
 };
 
-void Emitir_reporte(Nodo * ReservasV[100][7]){
+void Emitir_reporte(Nodo * ReservasV[100][7]){ // Emite el reporte de la matriz
     int cantReservas = 0;
     for (int ciudadId = 0; ciudadId <= 99; ciudadId++){
         cout << "Reserva de la ciudad "<< ciudadId << "-------------------------------------------------------  \n";
         for (int diaId = 0; diaId <= 6; diaId++){
             cout << "-Reserva del dia-"<< diaId << "\n";
                 if (ReservasV[ciudadId][diaId] == NULL){
-                    cout << "\t No hay reserva" << "\n";
+                    cout << "\t No hay reservas" << "\n";
                 } else{
-                    mostrar_lista(ReservasV[ciudadId][diaId]);
-                    cantReservas++;
+                    mostrar_lista(ReservasV[ciudadId][diaId],cantReservas);
                 };
         };
         mostrar_Reservasttl(cantReservas);
     };
+};
+
+void menu(FILE* reservaFile,Nodo * ReservasV[100][7]){
+    int endLoop;
+    while (endLoop != 0){
+        cout << "\n¿Que desea hacer ?"<< "\n";
+        cout << "1) Cargar datos "<< "\n";
+        cout << "2) Procesar archivo "<< "\n";
+        cout << "3) Emitir reporte"<< "\n";
+        cout << "0) Salir"<< "\n";
+        cin >> endLoop;
+
+        switch (endLoop){
+            case 1:
+                    Cargar_archivo(reservaFile);
+                break;
+            case 2:
+                    Procesar_archivo(reservaFile,ReservasV);
+                break;
+            case 3:
+                    Procesar_archivo(reservaFile,ReservasV); // sino lo pongo acá tambien, va a estar null la matriz
+                    Emitir_reporte(ReservasV);
+                break;
+            case 0: cout << "Se ha seleccionado salir"<< "\n"; break;
+            default: cout << "No se ha seleccionado ninguno otro"<< "\n";break;
+        };
+    }
+    
 };
 
 //Funciones extras 
@@ -101,23 +126,25 @@ void IngresarDatos(int &Cod_ciudadTemp, int &Cod_diaTemp,int &dniTemp){  // Le p
     cin >> dniTemp;
 };
 
-void mostrar_Reservasttl(int &cantReservas){
+void mostrar_Reservasttl(int &cantReservas){ // Muesta la cantidad total de la lista
     cout << "(Cantidad de reservas total = "<< cantReservas << ")"<< endl;
     cantReservas = 0;
 };
 
-void mostrar_lista(Nodo *head){// Mustra la lista 
+void mostrar_lista(Nodo *head, int &cantReservas ){// Mustra la lista 
     Nodo *temp = head; // crea un copia de la lista para recorrerla 
     cout << "\t";
     while (temp != NULL){
         cout << " Dni = " << temp->dni;
-        temp = temp->sig;  //Va a la siguiente direccion  
+        temp = temp->sig;  //Va a la siguiente direccion 
+        cantReservas++;
     };
     cout << "\n";
 };
 
 void test(int Cod_ciudadTemp, int Cod_diaTemp, int dniTemp){ //Para ver los valores leidos 
-        cout << " Ciudad = "<< Cod_ciudadTemp << "\n";
-        cout << " Dia = "<< Cod_diaTemp << "\n";
-        cout << " Dni = "<< dniTemp << "\n";
+        cout << " Ciudad = "<< Cod_ciudadTemp << " ";
+        cout << " Dia = "<< Cod_diaTemp << " ";
+        cout << " Dni = "<< dniTemp << " ";
+        cout << "\n";
 };
